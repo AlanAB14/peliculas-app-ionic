@@ -1,0 +1,22 @@
+ion-card img {
+
+    display: block!important; 
+    width: 100%!important;
+
+}
+
+.slide-mas {
+    height: 300px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+.btn-mas {
+    position: relative;
+    top: 13%;
+}
+
+ion-button {
+    --ripple-color: transparent;
+}
