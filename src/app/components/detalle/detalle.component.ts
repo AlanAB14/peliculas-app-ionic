@@ -1,10 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MoviesService } from 'src/app/services/movies.service';
 import { Cast, PeliculaDetalle, RespuestaVideos } from '../../interfaces/interfaces';
 import { Data } from '../../interfaces/providers.interface';
-import { ModalController } from '@ionic/angular';
+import { IonInfiniteScroll, ModalController } from '@ionic/angular';
 
-import { YoutubeVideoPlayer } from '@awesome-cordova-plugins/youtube-video-player/ngx';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DataLocalService } from 'src/app/services/data-local.service';
+
+
+
 
 
 
@@ -16,6 +20,15 @@ import { YoutubeVideoPlayer } from '@awesome-cordova-plugins/youtube-video-playe
 })
 export class DetalleComponent implements OnInit {
 
+  videoUrls: SafeResourceUrl [] = [];
+  data: SafeResourceUrl[] = [];
+
+  topLimit: number = 2;
+
+  @ViewChild( IonInfiniteScroll ) infiniteScroll: IonInfiniteScroll;
+
+
+
   @Input() id;
 
   pelicula: PeliculaDetalle = {};
@@ -23,6 +36,7 @@ export class DetalleComponent implements OnInit {
   providers: Data[];
   videos: RespuestaVideos;
   oculto = 150;
+  estrella = 'star-outline';
 
   slideOpts = {
     slidesPerView: 3.3,
@@ -32,44 +46,68 @@ export class DetalleComponent implements OnInit {
 
   constructor( private moviesService: MoviesService,
                private modalCtrl: ModalController,
-               private youtube: YoutubeVideoPlayer
+               private _sanitizer: DomSanitizer,
+               private dataLocal: DataLocalService
  ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     // console.log('ID', this.id)
+
+    this.dataLocal.existePelicula( this.id )
+      .then( existe => this.estrella = ( existe ) ? 'star' : 'star-outline' );
+
     this.moviesService.getPeliculaDetalle( this.id )
       .subscribe(resp => {
-        console.log(resp)
         this.pelicula = resp;
       })
 
       this.moviesService.getActoresPelicula( this.id )
       .subscribe(resp => {
-        console.log(resp);
         this.actores = resp.cast;
       })
 
       this.moviesService.getProviders( this.id )
         .subscribe( resp => {
           this.providers = resp.results?.AR?.flatrate;
-          console.log(this.providers)
       })
 
       this.moviesService.getVideos( this.id )
         .subscribe( resp => {
           this.videos = resp;
-          console.log(this.videos)
+          this.videos.results.forEach((video) => {
+            const newVideo = this._sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${video.key}`)
+            this.videoUrls.push(newVideo);
+          })
+
+          this.data = this.videoUrls.slice(0, this.topLimit);
       })
 
-      // this.youtube.openVideo('myvideoid');
+
   }
 
   regresar() {
     this.modalCtrl.dismiss();
   }
 
-  goToVideo( key: string ) {
-    this.youtube.openVideo(key)
+  favorito() {
+    const existe = this.dataLocal.saveMovie(this.pelicula);
+    this.estrella = ( existe ) ? 'star' : 'star-outline';
+
   }
+
+  loadData(e) {
+    setTimeout(() => {
+      this.topLimit += 2;
+      this.data = this.videoUrls.slice(0, this.topLimit)
+
+      this.infiniteScroll.complete();
+
+      if (this.data.length === this.videoUrls.length) {
+        this.infiniteScroll.disabled = true;
+      }
+    }, 1500);
+  }
+
+
 
 }

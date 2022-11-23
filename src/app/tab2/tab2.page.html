@@ -17,7 +17,7 @@
 
 <ion-content [fullscreen]="true">
 
-  <ion-grid>
+  <ion-grid *ngIf="buscando">
     <ion-row>
       <ion-col class="ion-text-center">
         <ion-spinner name="crescent"></ion-spinner>
@@ -25,7 +25,7 @@
     </ion-row>
   </ion-grid>
 
-  <ion-list>
+  <ion-list *ngIf="peliculas.length === 0">
     <ion-list-header>
       <ion-label>Ideas</ion-label>
     </ion-list-header>
@@ -36,4 +36,21 @@
       </ion-label>
     </ion-item>
   </ion-list>
+
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col *ngFor="let pelicula of peliculas" size="6">
+        <ion-card (click)="mostrarPelicula( pelicula.id )">
+          <img [src]="pelicula.poster_path | imagen">
+
+          <ion-card-header>
+            <ion-card-subtitle>{{ pelicula.release_date }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <h2>{{ pelicula.title }}</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

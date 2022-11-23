@@ -2,10 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Pelicula } from '../interfaces/interfaces';
 import { MoviesService } from '../services/movies.service';
 
-// import Swiper core and required modules
-import SwiperCore, { SwiperOptions, FreeMode } from 'swiper';
 
-SwiperCore.use([FreeMode]);
 
 
 

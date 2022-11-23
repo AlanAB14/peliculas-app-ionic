@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Pelicula } from 'src/app/interfaces/interfaces';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Pelicula, PeliculaDetalle } from 'src/app/interfaces/interfaces';
 import { ModalController } from '@ionic/angular';
 import { DetalleComponent } from '../detalle/detalle.component';
 
@@ -10,7 +10,8 @@ import { DetalleComponent } from '../detalle/detalle.component';
   styleUrls: ['./slideshow-poster.component.scss'],
 })
 export class SlideshowPosterComponent implements OnInit {
-  @Input() peliculas: Pelicula[] = [];
+  @Input() peliculas: Pelicula[] | PeliculaDetalle [] = [];
+  @Output() load =  new EventEmitter();
 
     slideOpts = {
     slidesPerView: 3.4,
@@ -29,6 +30,10 @@ export class SlideshowPosterComponent implements OnInit {
         id
       }
     });
+
+    modal.onWillDismiss().then( data => {
+      this.load.emit();
+    })
     
     modal.present();
   }

@@ -1,6 +1,6 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "peliculasApp",
+	"appId": "com.alanbersia.peliculasApp",
+	"appName": "peliculasInfoApp",
 	"webDir": "www",
 	"bundledWebRuntime": false
 }
